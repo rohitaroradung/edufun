@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "935434173993",
+    "firebase_url": "https://edufun-83d74.firebaseio.com",
+    "project_id": "edufun-83d74",
+    "storage_bucket": "edufun-83d74.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:935434173993:android:c1c0d45e58df42e1",
+        "android_client_info": {
+          "package_name": "com.example.hp.edufun"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "935434173993-714lp085gsmkgpn2qom4m56uv646u4n4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.hp.edufun",
+            "certificate_hash": "8491d9a86ab8276c836ba8036248972da16fbcb3"
+          }
+        },
+        {
+          "client_id": "935434173993-1iqpnrsr2a3ntnrsn0pvdvtosmsdr4fr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBmKeDr7OYaMhNwgWmFkhLCy-0bpRlCUwI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "935434173993-1iqpnrsr2a3ntnrsn0pvdvtosmsdr4fr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

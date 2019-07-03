@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#008577</color>
+    <color name="colorPrimaryDark">#00574B</color>
+    <color name="colorAccent">#D81B60</color>
+    <color name="activityBackground">	#0000FF</color>
+    <color name="Occupied">#FF2222</color>
+    <color name="Available">#4CAF50</color>
+    <color name="NA">#ADFFFF00</color>
+    <color name="errorMess">#FFD740</color>
+    <color name="reserved">#215CF3</color>
+    <color name ="yellow">#FEE066</color>
+   <color name ="green">#A5FBB3</color>
+</resources>

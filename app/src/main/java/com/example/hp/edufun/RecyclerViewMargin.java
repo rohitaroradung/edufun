@@ -1,9 +1,10 @@
 package com.example.hp.edufun;
 
 import android.graphics.Rect;
-import android.support.annotation.IntRange;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
+
+import androidx.annotation.IntRange;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class RecyclerViewMargin extends RecyclerView.ItemDecoration {
     private final int columns;

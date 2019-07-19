@@ -19,6 +19,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
 
+
         >
 
         <!--
@@ -36,8 +37,10 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
+
         <activity
             android:name=".ParkingActivity"
+
             android:label="@string/title_activity_parking"></activity>
         <activity android:name=".splash_screen">
             <intent-filter>

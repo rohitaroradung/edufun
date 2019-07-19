@@ -14,8 +14,10 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.CompoundButton;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ToggleButton;
 
@@ -31,30 +33,42 @@ import com.google.android.gms.maps.model.GroundOverlay;
 import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.DocumentReference;
 
+import java.util.List;
+
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.FragmentActivity;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
+
 
 public class ParkingActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private Location location;
-    Double lat,lon;
-    private  String Direction_request_url = "https://maps.googleapis.com/maps/api/directions/json?parameters";
+    Double lat, lon;
+    private String Direction_request_url = "https://maps.googleapis.com/maps/api/directions/json?parameters";
     private final String api_key = "AIzaSyBmKeDr7OYaMhNwgWmFkhLCy-0bpRlCUwI";
+    protected LatLng start;
+    protected LatLng end;
 
-    private final int requestcode =123;
+
+    private List<Polyline> polylines;
+    private static final int[] COLORS = new int[]{R.color.primary_dark_material_light};
+
+
+    private final int requestcode = 123;
     private FusedLocationProviderClient fusedLocationProviderClient;
-    private FloatingActionButton btnp1,btnp2;
+    private FloatingActionButton btnp1, btnp2;
     private static final DocumentReference mdoc = com.google.firebase.firestore.FirebaseFirestore.
             getInstance().document("Parking/p1");
 
@@ -64,10 +78,72 @@ public class ParkingActivity extends FragmentActivity implements OnMapReadyCallb
         setContentView(R.layout.activity_parking);
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         ToggleButton toggle = (ToggleButton) findViewById(R.id.info);
-        btnp1 = (FloatingActionButton)findViewById(R.id.btnP1);
-        btnp2 = (FloatingActionButton)findViewById(R.id.btnP2);
+        btnp1 = (FloatingActionButton) findViewById(R.id.btnP1);
+        btnp2 = (FloatingActionButton) findViewById(R.id.btnP2);
+        final ConstraintLayout main_content = (ConstraintLayout)findViewById(R.id.main_content);
+        ImageButton half_expand_button = (ImageButton) findViewById(R.id.half_exposed_button);
 
-        final LinearLayout linearLayout = (LinearLayout)findViewById(R.id.information);
+        NestedScrollView nestedScrollView = (NestedScrollView)findViewById(R.id.design_bottom_sheet);
+        BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.from(nestedScrollView);
+        CoordinatorLayout.LayoutParams layoutParams =  (CoordinatorLayout.LayoutParams) main_content.getLayoutParams();
+
+
+        bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                half_expand_button.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        switch (newState){
+                            case BottomSheetBehavior.STATE_COLLAPSED:
+                                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HALF_EXPANDED);
+                                break;
+                             case BottomSheetBehavior.STATE_HALF_EXPANDED:
+                                 bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                                 half_expand_button.setVisibility(View.GONE);
+                                 break;
+
+                        }
+                    }
+                });
+                if(newState==BottomSheetBehavior.STATE_EXPANDED) {
+                    half_expand_button.setVisibility(View.GONE);
+
+                }
+                else
+                    half_expand_button.setVisibility(View.VISIBLE);
+                if(newState==BottomSheetBehavior.STATE_HALF_EXPANDED){
+                    layoutParams.dodgeInsetEdges=Gravity.BOTTOM;
+
+                }
+                else {
+                    layoutParams.dodgeInsetEdges=Gravity.BOTTOM;
+                }
+
+
+            }
+
+            @Override
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+
+ /*              if(slideOffset>bottomSheetBehavior.getHalfExpandedRatio())
+                {
+                 layoutParams.dodgeInsetEdges= Gravity.NO_GRAVITY;
+                }
+               else{
+                   layoutParams.dodgeInsetEdges = Gravity.BOTTOM;
+               }
+*/
+                if(slideOffset==1.0)
+              {
+                  layoutParams.dodgeInsetEdges = Gravity.NO_GRAVITY;
+              }
+
+            }
+        });
+
+
+        final LinearLayout linearLayout = (LinearLayout) findViewById(R.id.information);
         toggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
@@ -83,6 +159,7 @@ public class ParkingActivity extends FragmentActivity implements OnMapReadyCallb
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+        mapFragment.setRetainInstance(true);
     }
 
 
@@ -140,15 +217,15 @@ public class ParkingActivity extends FragmentActivity implements OnMapReadyCallb
         GradientDrawable drawable = (GradientDrawable) getDrawable(R.drawable.rectangle);
         Bitmap bitmap = drawableToBitmap(drawable);
         GroundOverlayOptions groundOverlayOptions = new GroundOverlayOptions().image(BitmapDescriptorFactory.fromBitmap(bitmap)).bearing(-20)
-                .position(p1,dptopx((float)1.8288),dptopx((float) 3.6576)).clickable(true);
+                .position(p1, dptopx((float) 1.8288), dptopx((float) 3.6576)).clickable(true);
         mMap.addGroundOverlay(groundOverlayOptions);
 
         mMap.setOnGroundOverlayClickListener(new GoogleMap.OnGroundOverlayClickListener() {
             @Override
             public void onGroundOverlayClick(GroundOverlay groundOverlay) {
                 LatLng latLng = groundOverlay.getPosition();
-                 lat = latLng.latitude;
-                 lon = latLng.longitude;
+                lat = latLng.latitude;
+                lon = latLng.longitude;
 
                 mMap.addMarker(new MarkerOptions().position(latLng));
                 mMap.animateCamera(CameraUpdateFactory.newCameraPosition(CameraPosition.builder().target(p1).zoom(18).build()));
@@ -158,58 +235,51 @@ public class ParkingActivity extends FragmentActivity implements OnMapReadyCallb
                     fusedLocationProviderClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
                         @Override
                         public void onComplete(@NonNull Task<Location> task) {
-                        ParkingActivity.this.location =  task.getResult();
+                            ParkingActivity.this.location = task.getResult();
 
                             Double lat1 = location.getLatitude();
                             Double lon1 = location.getLongitude();
-
+                            start = new LatLng(lat1, lon1);
+                            end = new LatLng(lat, lon);
+                         /*  Routing routing = new Routing.Builder().key(api_key)
+                            .travelMode(AbstractRouting.TravelMode.DRIVING)
+                            .withListener(ParkingActivity.this)
+                            .alternativeRoutes(false)
+                            .waypoints(start, end)
+                            .build();
+                    routing.execute();*/
 
 
                             Uri baseUri = Uri.parse(Direction_request_url);
-                            Uri.Builder builder =   baseUri.buildUpon();
-                            builder.appendQueryParameter("origin",lat1+","+lon1);
-                            builder.appendQueryParameter("destination",lat+","+lon);
-                            builder.appendQueryParameter("key",api_key);
+                            Uri.Builder builder = baseUri.buildUpon();
+                            builder.appendQueryParameter("origin", lat1 + "," + lon1);
+                            builder.appendQueryParameter("destination", lat + "," + lon);
+                            builder.appendQueryParameter("key", api_key);
                             Direction_request_url = builder.toString();
                             JsonViewModel.doAction(Direction_request_url);
 
-                            JsonViewModel model = ViewModelProviders.of(ParkingActivity.this).get(JsonViewModel.class);
+                          /* JsonViewModel model = ViewModelProviders.of(ParkingActivity.this).get(JsonViewModel.class);
 
                             model.getData().observe(ParkingActivity.this, new Observer<PolylineOptions>() {
                                 @Override
                                 public void onChanged(PolylineOptions data) {
                                     // update UI
-                                    mMap.addPolyline(data);
+                                 Polyline polyline =   mMap.addPolyline(data);
+                              
                                 }
-                            });
+                            });*/
+
                         }
                     });
 
                 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
             }
         });
 
 
-
     }
 
-    private float  dptopx(float dp)
-    {
+    private float dptopx(float dp) {
 
         Resources r = getResources();
         float px = TypedValue.applyDimension(
@@ -221,21 +291,8 @@ public class ParkingActivity extends FragmentActivity implements OnMapReadyCallb
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-    private void requestLocationPermissions(){
-        if(ActivityCompat.shouldShowRequestPermissionRationale(ParkingActivity.this,Manifest.permission.ACCESS_FINE_LOCATION))
-        {
+    private void requestLocationPermissions() {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(ParkingActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)) {
             new AlertDialog.Builder(this)
                     .setTitle("Permission needed")
                     .setMessage("This permission is needed because of this and that")
@@ -243,7 +300,7 @@ public class ParkingActivity extends FragmentActivity implements OnMapReadyCallb
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             ActivityCompat.requestPermissions(ParkingActivity.this,
-                                    new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, requestcode);
+                                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, requestcode);
                         }
                     })
                     .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
@@ -254,19 +311,32 @@ public class ParkingActivity extends FragmentActivity implements OnMapReadyCallb
                     })
                     .create().show();
 
-        }
-        else{
-            ActivityCompat.requestPermissions(ParkingActivity.this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},requestcode);
+        } else {
+            ActivityCompat.requestPermissions(ParkingActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, requestcode);
         }
     }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         if (requestCode == ParkingActivity.this.requestcode) {
             if (permissions.length == 1 &&
                     permissions[0] == Manifest.permission.ACCESS_FINE_LOCATION &&
                     grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                mMap.setMyLocationEnabled(true);
+                if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    // TODO: Consider calling
+                    //    Activity#requestPermissions
+                    // here to request the missing permissions, and then overriding
+                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                    //                                          int[] grantResults)
+                    // to handle the case where the user grants the permission. See the documentation
+                    mMap.setMyLocationEnabled(true);
+                    // for Activity#requestPermissions for more details.
+                    return;
+                }
+
+
             } else {
+                requestLocationPermissions();
                 // Permission was denied. Display an error message.
             }
         }
@@ -320,5 +390,6 @@ public class ParkingActivity extends FragmentActivity implements OnMapReadyCallb
 
         return ContextCompat.getColor(this, magnitudeColorResourceId);
     }
+
 
 }

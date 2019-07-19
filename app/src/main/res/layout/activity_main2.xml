@@ -30,11 +30,6 @@
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@drawable/cardbackground"
-                android:paddingBottom="4dp">
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -59,7 +54,7 @@
 
 
             </RelativeLayout>
-            </FrameLayout>
+
         </androidx.cardview.widget.CardView>
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
@@ -71,11 +66,6 @@
 
 
             >
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="30dp"
-                android:background="@drawable/cardbackground">
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -102,7 +92,7 @@
 
 
             </RelativeLayout>
-            </FrameLayout>
+
         </androidx.cardview.widget.CardView>
 
 

@@ -7,6 +7,7 @@ normal user. For admin previliges,normal user have to ask a **admin**.
 ![sign_in_smart parking](https://github.com/rohitaroradung/edufun/assets/35729151/22bdfabc-ece9-4602-9f68-2ea76f45374b)
 
 * **Admin** can change the status of parking space,view all users of app and give admin privelges to normal user.
+  
   <video src='https://github.com/rohitaroradung/edufun/assets/35729151/feacc509-12a5-4d5e-ae52-d2ab9ec53f74' width=180/>
 
 
